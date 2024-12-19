@@ -11,7 +11,7 @@ import SwiftData
 struct ContentView: View {
     
     @Environment(\.modelContext) var modelContext
-    @Query var books: [Book]
+    @Query(sort: \Book.title) var books: [Book]
     
     @State private var showingAddScreen = false
     
@@ -34,6 +34,9 @@ struct ContentView: View {
                         }
                     }
                 }
+                .onDelete { indexSet in
+                    deleteBooks(at: indexSet)
+                }
             }
             .navigationTitle("Bookworm")
             .toolbar {
@@ -43,9 +46,29 @@ struct ContentView: View {
                     }
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    EditButton()
+                }
+            }
             .sheet(isPresented: $showingAddScreen) {
                 AddBookView()
             }
+            .navigationDestination(for: Book.self) { book in
+                DetailView(book: book)
+            }
+        }
+    }
+    
+    func deleteBooks(at offsets: IndexSet) {
+        
+        //IndexSet is a collection of integer indices
+        
+        //for loop iterates through each index in the IndexSet, and deletes it from our modelContext
+        for offset in offsets {
+            let book = books[offset]
+            
+            modelContext.delete(book)
         }
     }
 }
