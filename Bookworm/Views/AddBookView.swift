@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct AddBookView: View {
     
     @Environment(\.modelContext) var modelContext
@@ -15,11 +16,12 @@ struct AddBookView: View {
     @State private var title = ""
     @State private var author = ""
     @State private var rating = 3
-    @State private var genre = "Fantasy"
+    @State private var genre = "Select Genre"
     @State private var review = ""
     
+    @State private var missingEntriesAlert = false
     
-    let genres = ["Fantasy", "Horror", "Kids", "Mystery", "Poetry", "Romance", "Thriller"]
+    let genres = ["Select Genre", "Fantasy", "Horror", "Kids", "Mystery", "Poetry", "Romance", "Thriller"]
     
     
     var body: some View {
@@ -34,6 +36,7 @@ struct AddBookView: View {
                             Text($0)
                         }
                     }
+                    
                 }
                 
                 Section("Write a review") {
@@ -44,14 +47,52 @@ struct AddBookView: View {
                 
                 Section {
                     Button("Save") {
-                        let newBook = Book(title: title, author: author, genre: genre, review: review, rating: rating)
-                        modelContext.insert(newBook)
-                        dismiss()
+                        if (validateBookEntry == true) {
+                            let newBook = Book(title: title, author: author, genre: genre, review: review, rating: rating)
+                            modelContext.insert(newBook)
+                            dismiss()
+                        }
+                        else {
+                            missingEntriesAlert = true
+                        }
                     }
                 }
             }
             .navigationTitle("Add Book")
+            .alert("Missing Details:", isPresented: $missingEntriesAlert) {
+                Button("OK") {}
+            } message: {
+                Text(formulateAlertMessage)
+            }
+
         }
+    }
+    
+    var formulateAlertMessage: String {
+        
+        var alertMessage = ""
+        
+        if title.isEmpty {
+            alertMessage.append("Title\n")
+        }
+        if author.isEmpty {
+            alertMessage.append("Author\n")
+        }
+        if genre == genres[0] {
+            alertMessage.append("Genre\n")
+        }
+        
+        return alertMessage
+        
+    }
+    
+    
+    var validateBookEntry: Bool {
+        if (title.isEmpty || author.isEmpty || genre == genres[0]) {
+            return false
+        }
+        
+        return true
     }
 }
 
