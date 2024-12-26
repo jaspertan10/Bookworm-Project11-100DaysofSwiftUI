@@ -18,6 +18,7 @@ struct AddBookView: View {
     @State private var rating = 3
     @State private var genre = "Select Genre"
     @State private var review = ""
+    @State private var date = Date.now
     
     @State private var missingEntriesAlert = false
     
@@ -45,10 +46,14 @@ struct AddBookView: View {
                     RatingView(rating: $rating)
                 }
                 
+                Section("Current Date") {
+                    Text(date.formatted(date: .long, time: .omitted))
+                }
+                
                 Section {
                     Button("Save") {
                         if (validateBookEntry == true) {
-                            let newBook = Book(title: title, author: author, genre: genre, review: review, rating: rating)
+                            let newBook = Book(title: title, author: author, genre: genre, review: review, rating: rating, date: date)
                             modelContext.insert(newBook)
                             dismiss()
                         }

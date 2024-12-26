@@ -33,15 +33,22 @@ struct DetailView: View {
                     .offset(x: -5, y: -5)
             }
             
-            Text(book.author)
-                .font(.title)
-                .foregroundStyle(.secondary)
-            
-            Text(book.review)
-                .padding()
-            
-            RatingView(rating: .constant(book.rating))
-                .font(.largeTitle)
+            VStack(spacing: 20) {
+                Text(book.author)
+                    .font(.title)
+                    .foregroundStyle(.secondary)
+                
+                Text(book.review)
+                    .padding()
+                
+                RatingView(rating: .constant(book.rating))
+                    .font(.largeTitle)
+                
+                HStack {
+                    Text("Date Added: ")
+                    Text(book.date, format: .dateTime.month().day().year())
+                }
+            }
         }
         .navigationTitle(book.title)
         .navigationBarTitleDisplayMode(.inline)
@@ -63,6 +70,8 @@ struct DetailView: View {
 
     }
     
+    
+    
     func deleteBook() {
         modelContext.delete(book)
         dismiss()
@@ -74,7 +83,7 @@ struct DetailView: View {
     do {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: Book.self, configurations: config)
-        let example = Book(title: "Test Book", author: "Test Author", genre: "Fantasy", review: "This was a great book; I really enjoyed it.", rating: 4)
+        let example = Book(title: "Test Book", author: "Test Author", genre: "Fantasy", review: "This was a great book; I really enjoyed it.", rating: 4, date: Date.now)
 
         return DetailView(book: example)
             .modelContainer(container)
